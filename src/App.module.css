@@ -1,0 +1,27 @@
+.vocabList {
+  width: 250px;
+  height: 80vh;
+  overflow: auto;
+}
+
+.vocab {
+  cursor: pointer;
+}
+
+.vocab:hover {
+  background-color: #f1f1f1;
+}
+
+.selectedVocab {
+  text-align: center;
+  width: 300px;
+}
+
+.selectedVocab img {
+  width: 300px;
+}
+
+.recorder {
+  margin-top: 3rem;
+  margin-bottom: 3rem;
+}
