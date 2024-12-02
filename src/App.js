@@ -3,7 +3,7 @@ import Scripted from "./Scripted";
 import UnScripted from "./UnScripted";
 
 function App() {
-  const [app, setApp] = useState('scripted')
+  const [app, setApp] = useState('unscripted')
   // console.log(app)
   return (
     <>
