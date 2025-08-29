@@ -9,6 +9,7 @@ function Scripted() {
   const [selectedVocab, setSelectedVocab] = useState({})
   const [utterance, setUtterance] = useState()
   const [isScoring, setIsScoring] = useState(false)
+  const [plan, setPlan] = useState('standard')
 
   useEffect(() => {
     const getVocabs = async () => {
@@ -33,7 +34,7 @@ function Scripted() {
     formData.append('audio_file', blob)
     formData.append('sentence', selectedVocab.word)
     formData.append('return_feedback_hints', true)
-    formData.append('api_plan', 'standard')
+    formData.append('api_plan', plan)
     const config = {
       headers: {
         Authorization: `Elsa ${process.env.REACT_APP_ELSA_API_KEY}`,
@@ -72,7 +73,16 @@ function Scripted() {
 
   return (
     <div>
-      <table>
+      <div style={{ textAlign: 'center', marginTop: 5 }}>
+        <button onClick={() => setPlan('standard')} style={{ backgroundColor: plan === 'standard' ? '#ddd' : 'initial' }}>
+          Standard
+        </button>
+        &nbsp;&nbsp;
+        <button onClick={() => setPlan('premium')} style={{ backgroundColor: plan === 'premium' ? '#ddd' : 'initial' }}>
+          Premium
+        </button>
+      </div>
+      <table style={{ width: '100%' }}>
         <tbody>
           <tr>
             <td>
@@ -130,6 +140,9 @@ function Scripted() {
                   }
                 </>
               }
+            </td>
+            <td style={{ paddingLeft: 30, width: '40%' }}>
+              <textarea style={{ width: '100%' }} rows={40} value={JSON.stringify(utterance, null, 2)} readOnly={true}></textarea>
             </td>
           </tr>
         </tbody>

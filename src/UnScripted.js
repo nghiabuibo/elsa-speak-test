@@ -9,6 +9,7 @@ function UnScripted() {
     const [progress, setProgress] = useState(null)
     const [data, setData] = useState()
     const [fileUrl, setFileUrl] = useState('')
+    const [plan, setPlan] = useState('standard')
 
     const fileSrc = useMemo(() => {
         if (!file && !fileUrl) return;
@@ -48,7 +49,7 @@ function UnScripted() {
         const formData = new FormData()
         formData.append('audio', fileUrl || file)
         formData.append('return_json', true)
-        formData.append('api_plan', 'premium')
+        formData.append('api_plan', plan)
         const config = {
             headers: {
                 Authorization: `Elsa ${process.env.REACT_APP_ELSA_API_KEY}`,
@@ -66,7 +67,6 @@ function UnScripted() {
 
         setIsScoring(false)
         setData(response.data)
-        console.log(response.data)
     }
 
     const renderSpeakers = data?.speakers?.map(speaker => {
@@ -131,10 +131,10 @@ function UnScripted() {
                         </td>
                         <td>
                             <ul>
-                                <li>IELTS: {speaker.metrics.general_scores.other_scores.ielts_score}</li>
-                                <li>PTE: {speaker.metrics.general_scores.other_scores.pte_score}</li>
-                                <li>TOEFL: {speaker.metrics.general_scores.other_scores.toefl_score}</li>
-                                <li>TOECI: {speaker.metrics.general_scores.other_scores.toeic_score}</li>
+                                <li>IELTS: {speaker.metrics.general_scores.other_scores?.ielts_score}</li>
+                                <li>PTE: {speaker.metrics.general_scores.other_scores?.pte_score}</li>
+                                <li>TOEFL: {speaker.metrics.general_scores.other_scores?.toefl_score}</li>
+                                <li>TOECI: {speaker.metrics.general_scores.other_scores?.toeic_score}</li>
                             </ul>
                         </td>
                     </tbody>
@@ -142,10 +142,10 @@ function UnScripted() {
                 <ul>
                     <li>Pausing: {speaker.metrics.other_metrics.fluency.pausing_score}</li>
                     <li>Fluency: {speaker.metrics.other_metrics.fluency.words_per_minute} words per minute</li>
-                    <li>Energy: {speaker.metrics.other_metrics.intonation.energy_variation}</li>
-                    <li>Pitch: {speaker.metrics.other_metrics.intonation.pitch_variation}</li>
-                    <li>Word Prominence: {speaker.metrics.other_metrics.intonation.word_prominence_score}</li>
-                    <li>Word Prominence Cerf: {speaker.metrics.other_metrics.intonation.word_prominence_cefr}</li>
+                    <li>Energy: {speaker.metrics.other_metrics.intonation?.energy_variation}</li>
+                    <li>Pitch: {speaker.metrics.other_metrics.intonation?.pitch_variation}</li>
+                    <li>Word Prominence: {speaker.metrics.other_metrics.intonation?.word_prominence_score}</li>
+                    <li>Word Prominence Cerf: {speaker.metrics.other_metrics.intonation?.word_prominence_cefr}</li>
                 </ul>
                 <br />
                 Utterances:
@@ -185,68 +185,89 @@ function UnScripted() {
 
     return (
         <>
-            <div>
-                <input type="file" onInput={handleFileInput} />
+            <div style={{ textAlign: 'center', marginTop: 5 }}>
+                <button onClick={() => setPlan('standard')} style={{ backgroundColor: plan === 'standard' ? '#ddd' : 'initial' }}>
+                    Standard
+                </button>
+                &nbsp;&nbsp;
+                <button onClick={() => setPlan('premium')} style={{ backgroundColor: plan === 'premium' ? '#ddd' : 'initial' }}>
+                    Premium
+                </button>
             </div>
-            <div>OR</div>
-            <div>
-                <input type="text" onInput={handleFileUrlInput} placeholder="File URL" />
-            </div>
-            <br />
-            <AudioRecorder
-                onRecordingComplete={handleRecordingComplete}
-                audioTrackConstraints={{
-                    noiseSuppression: true,
-                    echoCancellation: true,
-                }}
-                showVisualizer={true}
-            />
-            <br />
-            {
-                fileSrc &&
-                <>
-                    <audio src={fileSrc} controls={true} />
-                    <br />
-                    {
-                        !isScoring
-                            ?
-                            <button onClick={sendScoring}>Send scoring</button>
-                            :
-                            <>
-                                {
-                                    progress !== null
-                                        ?
-                                        <div>Uploading: {(progress * 100).toFixed(2)}%</div>
-                                        :
-                                        <div>Scoring...</div>
-                                }
-                            </>
-                    }
-                </>
-            }
-            <br />
-            <br />
-            {
-                (data?.recording_quality !== 'ok')
-                    ?
-                    <>
-                        {
-                            data?.assessment_quality && <div>Assessment quality: {data?.assessment_quality}</div>
-                        }
-                        {
-                            data?.recording_quality && <div>Recording quality: {data?.recording_quality}</div>
-                        }
-                    </>
-                    :
-                    <>
-                        {/* <div><strong>Transcript:</strong> {data?.transcript}</div>
+
+            <table style={{ width: '100%' }}>
+                <tbody>
+                    <tr>
+                        <td style={{ paddingLeft: 30 }}>
+                            <div>
+                                <input type="file" onInput={handleFileInput} />
+                            </div>
+                            <div>OR</div>
+                            <div>
+                                <input type="text" onInput={handleFileUrlInput} placeholder="File URL" />
+                            </div>
+                            <br />
+                            <AudioRecorder
+                                onRecordingComplete={handleRecordingComplete}
+                                audioTrackConstraints={{
+                                    noiseSuppression: true,
+                                    echoCancellation: true,
+                                }}
+                                showVisualizer={true}
+                            />
+                            <br />
+                            {
+                                fileSrc &&
+                                <>
+                                    <audio src={fileSrc} controls={true} />
+                                    <br />
+                                    {
+                                        !isScoring
+                                            ?
+                                            <button onClick={sendScoring}>Send scoring</button>
+                                            :
+                                            <>
+                                                {
+                                                    progress !== null
+                                                        ?
+                                                        <div>Uploading: {(progress * 100).toFixed(2)}%</div>
+                                                        :
+                                                        <div>Scoring...</div>
+                                                }
+                                            </>
+                                    }
+                                </>
+                            }
+                            <br />
+                            <br />
+                            {
+                                (data?.recording_quality !== 'ok')
+                                    ?
+                                    <>
+                                        {
+                                            data?.assessment_quality && <div>Assessment quality: {data?.assessment_quality}</div>
+                                        }
+                                        {
+                                            data?.recording_quality && <div>Recording quality: {data?.recording_quality}</div>
+                                        }
+                                    </>
+                                    :
+                                    <>
+                                        {/* <div><strong>Transcript:</strong> {data?.transcript}</div>
                         <br /> */}
-                        {
-                            data?.assessment_quality && <div>Assessment quality: {data?.assessment_quality}</div>
-                        }
-                        {renderSpeakers}
-                    </>
-            }
+                                        {
+                                            data?.assessment_quality && <div>Assessment quality: {data?.assessment_quality}</div>
+                                        }
+                                        {renderSpeakers}
+                                    </>
+                            }
+                        </td>
+                        <td style={{ paddingLeft: 30, width: '40%' }}>
+                            <textarea style={{ width: '100%' }} rows={40} value={JSON.stringify(data, null, 2)} readOnly={true}></textarea>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </>
     )
 }
